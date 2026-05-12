@@ -1,6 +1,7 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import * as tasksService from '../services/tasks.service';
 import { TaskFilters } from '../services/tasks.service';
+import errorHandler from '../common/errorHandler';
 
 export const create = async (req: Request, res: Response) => {
   const userId = req.user!.id;
@@ -8,16 +9,21 @@ export const create = async (req: Request, res: Response) => {
   res.status(201).json(task);
 };
 
-export const findAll = async (req: Request, res: Response) => {
-  const userId = req.user!.id;
-  const filters = req.query as unknown as TaskFilters;
-  const { tasks, total, page, limit } = await tasksService.findAll(userId, filters);
-  res.status(200).json({
-    data: tasks,
-    total,
-    page,
-    limit,
-  });
+export const findAll = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.user!.id;
+    const filters = req.query as unknown as TaskFilters;
+    const { tasks, total, page, limit } = await tasksService.findAll(userId, filters);
+    res.status(200).json({
+      data: tasks,
+      total,
+      page,
+      limit,
+    });
+  } catch (err: any) {
+    errorHandler(err, req, res, next);
+  }
+
 };
 
 export const findOne = async (req: Request, res: Response) => {

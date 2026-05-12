@@ -18,7 +18,10 @@ interface LeanTask {
   status: string;
   dueDate: Date;
   tags: string[];
-  user: string | mongoose.Types.ObjectId;
+  user: {
+    name: string;
+    email: string;
+  };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -55,6 +58,7 @@ export const findAll = async (
 
   const tasks = await Task
     .find(query)
+    .populate('user', 'name email')
     .sort({ createdAt: -1 })
     .skip(skip)
     .limit(limit)
@@ -70,12 +74,12 @@ export const findAll = async (
 };
 
 export const findOne = async (id: string, userId: string): Promise<ITask> => {
-  const task = await Task.findById(id);
+  const task = await Task.findOne({ _id: id, user: userId }).populate('user', 'name email');
   
-  if (!task) throw new AppError('Task not found', 404);
-  
-  if (task.user.toString() !== userId.toString()) {
-    throw new AppError('Forbidden', 403);
+  if (!task) {
+    const exists = await Task.exists({ _id: id });
+    if (exists) throw new AppError('Forbidden', 403);
+    throw new AppError('Task not found', 404);
   }
   
   return task;
@@ -85,7 +89,8 @@ export const create = async (
   taskData: Partial<ITask>,
   userId: string
 ): Promise<ITask> => {
-  return Task.create({ ...taskData, user: userId });
+  const task = await Task.create({ ...taskData, user: userId });
+  return task.populate('user', 'name email');
 };
 
 export const update = async (

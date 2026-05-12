@@ -102,6 +102,8 @@ router.post('/', validate(createTaskSchema), tasksController.create);
  *               $ref: '#/components/schemas/ErrorResponse' */
 router.get('/', validate(taskFiltersSchema, 'query'), tasksController.findAll);
 
+// router.use('/', errorHandler); // Commented out to use manual handling in controller instead
+
 /**
  * @swagger
  * /tasks/{id}:

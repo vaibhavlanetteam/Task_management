@@ -13,7 +13,7 @@ export interface ITask extends Document {
   status: TaskStatus;
   dueDate: Date;
   tags: string[];
-  user: mongoose.Types.ObjectId;
+  user: mongoose.Types.ObjectId | { name: string; email: string };
   createdAt: Date;
   updatedAt: Date;
 }

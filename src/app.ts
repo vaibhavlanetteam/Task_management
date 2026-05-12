@@ -53,6 +53,13 @@ const swaggerSpec = swaggerJsdoc({
             status: { type: 'string', enum: ['todo', 'in-progress', 'done'] },
             dueDate: { type: 'string', format: 'date-time' },
             tags: { type: 'array', items: { type: 'string' } },
+            user: {
+              type: 'object',
+              properties: {
+                name: { type: 'string' },
+                email: { type: 'string' },
+              }
+            },
             createdAt: { type: 'string', format: 'date-time' },
             updatedAt: { type: 'string', format: 'date-time' },
           }
